@@ -19,4 +19,12 @@ public class OnlineStoreService {
 
     }
 
+    public double totalIncomeAllCompletedOrders() {
+        return orders.stream()
+                .filter(c -> c.getStatus() == OrderStatus.DELIVERED)
+                .mapToDouble(c -> c.getItems().stream().mapToDouble(i -> i.getPrice()).sum())
+                .sum();
+
+    }
+
 }
