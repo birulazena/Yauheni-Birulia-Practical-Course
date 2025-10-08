@@ -52,4 +52,14 @@ public class OnlineStoreService {
                         .sum()).average().orElse(0.0);
     }
 
+    public List<Customer> customersWhoHaveMoreThan5Orders() {
+        return orders.stream()
+                .collect(Collectors.groupingBy(Order::getCustomer, Collectors.counting()))
+                .entrySet()
+                .stream()
+                .filter(c -> c.getValue() > 5)
+                .map(Map.Entry::getKey)
+                .toList();
+    }
+
 }
