@@ -26,7 +26,7 @@ public class OnlineStoreService {
     public double totalIncomeAllCompletedOrders() {
         return orders.stream()
                 .filter(c -> c.getStatus() == OrderStatus.DELIVERED)
-                .mapToDouble(c -> c.getItems().stream().mapToDouble(i -> i.getPrice()).sum())
+                .mapToDouble(c -> c.getItems().stream().mapToDouble(i -> i.getPrice() * i.getQuantity()).sum())
                 .sum();
 
     }
@@ -40,7 +40,16 @@ public class OnlineStoreService {
                 .stream()
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
-                .toString();
+                .orElse("");
+    }
+
+    public double averageCheckSuccessfullyDeliveredOrders() {
+        return orders.stream()
+                .filter(order -> order.getStatus() == OrderStatus.DELIVERED)
+                .mapToDouble(order -> order.getItems()
+                        .stream()
+                        .mapToDouble(oi -> oi.getPrice() * oi.getQuantity())
+                        .sum()).average().orElse(0.0);
     }
 
 }
