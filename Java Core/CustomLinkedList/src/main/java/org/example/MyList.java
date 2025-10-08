@@ -7,7 +7,6 @@ public class MyList<T> {
     long listSize;
 
     public MyList() {
-
     }
 
     public long size() {
