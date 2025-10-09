@@ -16,7 +16,6 @@ public class OnlineStoreService {
 
     public List<String> citiesWhereOrdersCameFrom() {
         return orders.stream()
-                .filter(c -> c.getStatus() == OrderStatus.DELIVERED)
                 .map(c -> c.getCustomer().getCity())
                 .distinct()
                 .toList();
