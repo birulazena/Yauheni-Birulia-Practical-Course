@@ -25,8 +25,8 @@ public class Factory implements Runnable{
     private void makingDetails()  {
         Random r = new Random();
         for(int i = 0; i < 10; i++) {
-//            finishedDetailsDeque.add(details.get(r.nextInt(4)));
-            finishedDetailsDeque.add(details.get((i + 1) % 4));
+            finishedDetailsDeque.add(details.get(r.nextInt(4)));
+//            finishedDetailsDeque.add(details.get((i + 1) % 4));
         }
     }
 
@@ -36,9 +36,9 @@ public class Factory implements Runnable{
             try {
                 isOpen = false;
                 makingDetails();
-                Thread.sleep(300);
+                Thread.sleep(30);
                 isOpen = true;
-                Thread.sleep(300);
+                Thread.sleep(30);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
         }

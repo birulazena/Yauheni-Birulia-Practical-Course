@@ -41,7 +41,7 @@ public class World implements IFraction, Runnable{
                 temp = factory.getDetail();
                 if (temp == null) {
                     for (int i = 0; i < 10; i++) {
-                        Thread.sleep(50);
+                        Thread.sleep(6);
                         temp = factory.getDetail();
                         if (temp != null) {
                             break;
@@ -52,7 +52,7 @@ public class World implements IFraction, Runnable{
                     }
                 }
                 details.addAll(temp);
-                Thread.sleep(100);
+                Thread.sleep(10);
             }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
