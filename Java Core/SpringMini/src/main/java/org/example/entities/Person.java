@@ -2,10 +2,11 @@ package org.example.entities;
 
 import org.example.annotations.MyComponent;
 import org.example.annotations.MyScope;
+import org.example.lifecycle.InitializingBean;
 
 @MyComponent
 @MyScope("prototype")
-public class Person {
+public class Person implements InitializingBean {
 
     private String name = "hello";
 
@@ -21,4 +22,8 @@ public class Person {
         return name;
     }
 
+    @Override
+    public void afterPropertiesSet() {
+        System.out.println("Все хорошо!");
+    }
 }

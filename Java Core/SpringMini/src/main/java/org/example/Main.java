@@ -1,11 +1,9 @@
 package org.example;
 
-import org.example.annotations.MyAutowired;
 import org.example.context.MiniApplicationContext;
 import org.example.entities.Check;
 import org.example.entities.Conf;
 import org.example.entities.Person;
-import org.example.factory.BeanFactory;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -30,7 +28,5 @@ public class Main {
 
         c.getP();
 
-//        Person person = BeanFactory.getInstance().getBean(Person.class);
-//        System.out.println(person.getName());
     }
 }
