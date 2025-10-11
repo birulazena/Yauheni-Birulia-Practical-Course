@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.Phaser;
 
 public class Factory implements Runnable{
 
@@ -12,40 +13,35 @@ public class Factory implements Runnable{
 
     private final int days;
 
-    private volatile boolean isOpen;
+    private Phaser phaser;
 
     private BlockingDeque<String> finishedDetailsDeque;
 
-    public Factory(int days) {
+    public Factory(Phaser phaser, int days) {
         finishedDetailsDeque = new LinkedBlockingDeque<>();
         this.days = days;
-        this.isOpen = false;
+        this.phaser = phaser;
+        phaser.register();
     }
 
     private void makingDetails()  {
         Random r = new Random();
         for(int i = 0; i < 10; i++) {
             finishedDetailsDeque.add(details.get(r.nextInt(4)));
-//            finishedDetailsDeque.add(details.get((i + 1) % 4));
         }
     }
 
     @Override
     public void run() {
-        for(int i = 0; i < days; i++)
-            try {
-                isOpen = false;
-                makingDetails();
-                Thread.sleep(30);
-                isOpen = true;
-                Thread.sleep(30);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+        for(int i = 0; i < days; i++) {
+            makingDetails();
+            phaser.arriveAndAwaitAdvance();
         }
+        phaser.arriveAndDeregister();
     }
 
     public List<String> getDetail() {
-        if (!isOpen || finishedDetailsDeque.isEmpty()) {
+        if (finishedDetailsDeque.isEmpty()) {
             return null;
         }
         List<String> result = new ArrayList<>();
@@ -54,5 +50,4 @@ public class Factory implements Runnable{
         }
         return result;
     }
-
 }
