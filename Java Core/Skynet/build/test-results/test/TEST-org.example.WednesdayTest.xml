@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.example.WednesdayTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2025-10-10T07:53:07.791Z" hostname="birulya-zhenka-Redmi-Book-Pro-15-2023" time="0.706">
+  <properties/>
+  <testcase name="Создание роботов Wednesday" classname="org.example.WednesdayTest" time="0.038"/>
+  <testcase name="Создание роботов World" classname="org.example.WednesdayTest" time="0.004"/>
+  <testcase name="Проверка работы двух фракций одновременно" classname="org.example.WednesdayTest" time="0.658"/>
+  <system-out><![CDATA[50
+50
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
