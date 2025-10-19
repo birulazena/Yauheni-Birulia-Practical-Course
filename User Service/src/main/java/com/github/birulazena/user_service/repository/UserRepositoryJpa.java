@@ -20,8 +20,8 @@ public interface UserRepositoryJpa extends JpaRepository<User, Long> {
     @EntityGraph(attributePaths = "cards")
     Page<User> findAll(Pageable pageable);
 
-    @Query(value = "SELECT * FROM users WHERE users.email = :email", nativeQuery = true)
-    Optional<User> getUserByEmail(@Param("email") String email);
+    @EntityGraph(attributePaths = "cards")
+    Optional<User> getUserByEmail(String email);
 
 //    Для обновления использовать меод save
 
