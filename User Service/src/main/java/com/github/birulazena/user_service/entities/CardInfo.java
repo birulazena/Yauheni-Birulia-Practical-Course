@@ -3,7 +3,7 @@ package com.github.birulazena.user_service.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -26,6 +26,6 @@ public class CardInfo {
     private String holder;
 
     @Column(name = "expiration_date")
-    private Date expirationDate;
+    private LocalDate expirationDate;
 
 }
