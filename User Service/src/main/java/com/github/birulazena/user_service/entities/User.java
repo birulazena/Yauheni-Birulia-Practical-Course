@@ -1,10 +1,16 @@
 package com.github.birulazena.user_service.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import java.util.List;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "users")
 public class User {
@@ -22,7 +28,7 @@ public class User {
 
     private String email;
 
-    @OneToMany()
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CardInfo> cards;
 
 }
