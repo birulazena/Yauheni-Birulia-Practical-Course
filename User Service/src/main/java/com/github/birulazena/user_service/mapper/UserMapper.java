@@ -10,7 +10,8 @@ import org.mapstruct.ReportingPolicy;
 import org.mapstruct.ap.internal.gem.MappingInheritanceStrategyGem;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
-        unmappedTargetPolicy = ReportingPolicy.IGNORE)
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        uses = CardInfoMapper.class)
 public interface UserMapper {
 
     @Mapping(target = "id", ignore = true)

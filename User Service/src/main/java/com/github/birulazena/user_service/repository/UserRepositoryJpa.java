@@ -21,7 +21,7 @@ public interface UserRepositoryJpa extends JpaRepository<User, Long> {
     Page<User> findAll(Pageable pageable);
 
     @EntityGraph(attributePaths = "cards")
-    Optional<User> getUserByEmail(String email);
+    Optional<User> findByEmail(String email);
 
 //    Для обновления использовать меод save
 
