@@ -63,6 +63,12 @@ databaseChangeLog:
                   type: DATE
                   constraints:
                     nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: card_info
+            baseColumnNames: user_id
+            constraintName: fk_card_info_user
+            referencedTableName: users
+            referencedColumnNames: id
         - createIndex:
             tableName: card_info
             indexName: idx_card_info_user_id
