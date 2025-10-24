@@ -6,6 +6,8 @@ import com.github.birulazena.user_service.dto.UserRequestDto;
 import com.github.birulazena.user_service.dto.UserResponseDto;
 import com.github.birulazena.user_service.entities.CardInfo;
 import com.github.birulazena.user_service.entities.User;
+import com.github.birulazena.user_service.exception.CardInfoNotFoundException;
+import com.github.birulazena.user_service.exception.DuplicateEmailException;
 import com.github.birulazena.user_service.exception.UserNotFoundException;
 import com.github.birulazena.user_service.mapper.CardInfoMapper;
 import com.github.birulazena.user_service.mapper.UserMapper;
@@ -30,6 +32,10 @@ public class UserService {
 
     public UserResponseDto createUser(UserRequestDto userDto) {
 
+        if(userRepositoryJpa.findByEmail(userDto.email()).isPresent()) {
+            throw new DuplicateEmailException("A user with this email already exists. Email: " + userDto.email());
+        }
+
         User user = userMapper.toEntity(userDto);
         User saveUser = userRepositoryJpa.save(user);
         return userMapper.toDto(saveUser);
@@ -52,7 +58,7 @@ public class UserService {
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public UserResponseDto updateUser(Long id, UserRequestDto userDto) {
-
+        userRepositoryJpa.findById(id).orElseThrow(() -> new UserNotFoundException("User not found ID: " + id));
         User user = userMapper.toEntity(userDto);
         user.setId(id);
         User saveUser = userRepositoryJpa.save(user);
@@ -61,6 +67,9 @@ public class UserService {
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void deleteUserById(Long id) {
+        if(userRepositoryJpa.findById(id).isEmpty()) {
+            throw new UserNotFoundException("User not fount ID: " + id);
+        }
         userRepositoryJpa.deleteById(id);
     }
 
@@ -84,6 +93,9 @@ public class UserService {
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void deleteCardInfoFromUserById(Long id) {
+        if(cardInfoRepository.findById(id).isEmpty()) {
+            throw new CardInfoNotFoundException("Card not found ID: " + id);
+        }
         cardInfoRepository.deleteById(id);
     }
 
