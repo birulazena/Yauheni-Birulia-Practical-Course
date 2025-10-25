@@ -25,6 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 
 @Service
 @AllArgsConstructor
@@ -92,35 +94,52 @@ public class UserService {
         User user = userRepositoryJpa.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not fount ID: " + id));
 
+        userRepositoryJpa.deleteById(id);
+
         cacheManager.getCache("user_email_cache").evict(user.getEmail());
 
-        userRepositoryJpa.deleteById(id);
     }
 
     public CardInfoResponseDto addCardInfoToUser(CardInfoRequestDto cardInfoDto){
         CardInfo cardInfo = cardInfoMapper.toEntity(cardInfoDto);
-        cardInfo.setUser(userRepositoryJpa.findById(cardInfoDto.userId())
-                .orElseThrow(() -> new UserNotFoundException("User not found ID: " + cardInfoDto.userId())));
+        User user = userRepositoryJpa.findById(cardInfoDto.userId())
+                .orElseThrow(() -> new UserNotFoundException("User not found ID: " + cardInfoDto.userId()));
+        cardInfo.setUser(user);
         CardInfo cardInfoSave = cardInfoRepository.save(cardInfo);
-        return cardInfoMapper.toDto(cardInfoSave);
+        CardInfoResponseDto cardInfoResponseDto = cardInfoMapper.toDto(cardInfoSave);
+
+        cacheManager.getCache("user_cache").evict(user.getId());
+        cacheManager.getCache("user_email_cache").evict(user.getEmail());
+
+        return cardInfoResponseDto;
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public CardInfoResponseDto updateCardInfoToUser(Long id, CardInfoRequestDto cardInfoDto) {
         CardInfo cardInfo = cardInfoMapper.toEntity(cardInfoDto);
-        cardInfo.setUser(userRepositoryJpa.findById(cardInfoDto.userId())
-                .orElseThrow(() -> new UserNotFoundException("User not found ID: " + cardInfoDto.userId())));
+        User user = userRepositoryJpa.findById(cardInfoDto.userId())
+                .orElseThrow(() -> new UserNotFoundException("User not found ID: " + cardInfoDto.userId()));
+        cardInfo.setUser(user);
         cardInfo.setId(id);
         CardInfo cardInfoSave = cardInfoRepository.save(cardInfo);
-        return cardInfoMapper.toDto(cardInfoSave);
+        CardInfoResponseDto cardInfoResponseDto = cardInfoMapper.toDto(cardInfoSave);
+
+        cacheManager.getCache("user_cache").evict(user.getId());
+        cacheManager.getCache("user_email_cache").evict(user.getEmail());
+
+        return cardInfoResponseDto;
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void deleteCardInfoFromUserById(Long id) {
-        if(cardInfoRepository.findById(id).isEmpty()) {
+        Optional<CardInfo> cardInfo = cardInfoRepository.findById(id);
+        if(cardInfo.isEmpty()) {
             throw new CardInfoNotFoundException("Card not found ID: " + id);
         }
         cardInfoRepository.deleteById(id);
+
+        cacheManager.getCache("user_cache").evict(cardInfo.get().getUser().getId());
+        cacheManager.getCache("user_email_cache").evict(cardInfo.get().getUser().getEmail());
     }
 
 
