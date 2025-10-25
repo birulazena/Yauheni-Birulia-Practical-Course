@@ -1,8 +1,12 @@
 package com.github.birulazena.user_service.unit;
 
+import com.github.birulazena.user_service.dto.CardInfoRequestDto;
+import com.github.birulazena.user_service.dto.CardInfoResponseDto;
 import com.github.birulazena.user_service.dto.UserRequestDto;
 import com.github.birulazena.user_service.dto.UserResponseDto;
+import com.github.birulazena.user_service.entities.CardInfo;
 import com.github.birulazena.user_service.entities.User;
+import com.github.birulazena.user_service.exception.CardInfoNotFoundException;
 import com.github.birulazena.user_service.exception.DuplicateEmailException;
 import com.github.birulazena.user_service.exception.UserNotFoundException;
 import com.github.birulazena.user_service.mapper.CardInfoMapper;
@@ -52,7 +56,7 @@ public class UserServiceTest {
     private CacheManager cacheManager;
 
     @Mock
-    private Cache userEmailCache;
+    private Cache userCache;
 
     @InjectMocks
     private UserService userService;
@@ -307,14 +311,167 @@ public class UserServiceTest {
                 "birulya.zhenka@gmail.com", new ArrayList<>());
 
         when(userRepositoryJpa.findById(1L)).thenReturn(Optional.of(user));
-        when(cacheManager.getCache("user_email_cache")).thenReturn(userEmailCache);
+        when(cacheManager.getCache("user_email_cache")).thenReturn(userCache);
 
         userService.deleteUserById(1L);
 
     }
 
     @Test
-    public void addCardInfoToUserException()
+    public void addCardInfoToUserException() {
+        CardInfoRequestDto cardInfoRequestDto = new CardInfoRequestDto(1L,
+                "1234567812341234",
+                "Zenya",
+                LocalDate.now());
+
+        CardInfo cardInfo = new CardInfo(null,
+                null,
+                "1234567812341234",
+                "Zenya",
+                LocalDate.now());
+
+        when(cardInfoMapper.toEntity(cardInfoRequestDto)).thenReturn(cardInfo);
+        when(userRepositoryJpa.findById(1L)).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> userService.addCardInfoToUser(cardInfoRequestDto));
+    }
+
+    @Test
+    public void addCardInfoToUser(){
+
+        CardInfoRequestDto cardInfoRequestDto = new CardInfoRequestDto(1L,
+                "1234567812341234",
+                "Zenya",
+                LocalDate.now());
+
+        CardInfo cardInfo = new CardInfo(null,
+                null,
+                "1234567812341234",
+                "Zenya",
+                LocalDate.now());
+
+        User user = new User(1L,
+                "Zenya",
+                "Birulia",
+                LocalDate.now(),
+                "birulya.zhenka@gmail.com", new ArrayList<>());
+
+        CardInfo cardInfoSave = new CardInfo(1L,
+                user,
+                "1234567812341234",
+                "Zenya",
+                LocalDate.now());
+
+        CardInfoResponseDto cardInfoResponseDto = new CardInfoResponseDto(1L,
+                user.getId(),
+                "************1234",
+                "Zenya",
+                LocalDate.now());
+
+        when(cardInfoMapper.toEntity(cardInfoRequestDto)).thenReturn(cardInfo);
+        when(userRepositoryJpa.findById(1L)).thenReturn(Optional.of(user));
+        when(cardInfoRepository.save(cardInfo)).thenReturn(cardInfoSave);
+        when(cardInfoMapper.toDto(cardInfoSave)).thenReturn(cardInfoResponseDto);
+
+        when(cacheManager.getCache("user_cache")).thenReturn(userCache);
+        when(cacheManager.getCache("user_email_cache")).thenReturn(userCache);
+
+        assertEquals(cardInfoResponseDto, userService.addCardInfoToUser(cardInfoRequestDto));
+
+    }
+
+    @Test
+    public void updateCardInfoToUserException() {
+        CardInfoRequestDto cardInfoRequestDto = new CardInfoRequestDto(1L,
+                "1234567812341234",
+                "Zenya",
+                LocalDate.now());
+
+        CardInfo cardInfo = new CardInfo(null,
+                null,
+                "1234567812341234",
+                "Zenya",
+                LocalDate.now());
+
+        when(cardInfoMapper.toEntity(cardInfoRequestDto)).thenReturn(cardInfo);
+        when(userRepositoryJpa.findById(1L)).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> userService.updateCardInfoToUser(1L, cardInfoRequestDto));
+
+    }
+
+    @Test
+    public void updateCardInfoToUserTest() {
+        CardInfoRequestDto cardInfoRequestDto = new CardInfoRequestDto(1L,
+                "1234567812341234",
+                "Zenya",
+                LocalDate.now());
+
+        CardInfo cardInfo = new CardInfo(null,
+                null,
+                "1234567812341234",
+                "Zenya",
+                LocalDate.now());
+
+        User user = new User(1L,
+                "Zenya",
+                "Birulia",
+                LocalDate.now(),
+                "birulya.zhenka@gmail.com", new ArrayList<>());
+
+        CardInfo cardInfoSave = new CardInfo(1L,
+                user,
+                "1234567812341234",
+                "Zenya",
+                LocalDate.now());
+
+        CardInfoResponseDto cardInfoResponseDto = new CardInfoResponseDto(1L,
+                user.getId(),
+                "************1234",
+                "Zenya",
+                LocalDate.now());
+
+        when(cardInfoMapper.toEntity(cardInfoRequestDto)).thenReturn(cardInfo);
+        when(userRepositoryJpa.findById(1L)).thenReturn(Optional.of(user));
+        when(cardInfoRepository.save(cardInfo)).thenReturn(cardInfoSave);
+        when(cardInfoMapper.toDto(cardInfoSave)).thenReturn(cardInfoResponseDto);
+
+        when(cacheManager.getCache("user_cache")).thenReturn(userCache);
+        when(cacheManager.getCache("user_email_cache")).thenReturn(userCache);
+
+        assertEquals(cardInfoResponseDto, userService.updateCardInfoToUser(1L, cardInfoRequestDto));
+    }
+
+    @Test
+    public void deleteCardInfoFromUserByIdExceptionTest() {
+        when(cardInfoRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(CardInfoNotFoundException.class, () -> userService.deleteCardInfoFromUserById(1L));
+    }
+
+    @Test
+    public void deleteCardInfoFromUserByIdTest() {
+        User user = new User(1L,
+                "Zenya",
+                "Birulia",
+                LocalDate.now(),
+                "birulya.zhenka@gmail.com", new ArrayList<>());
+
+        CardInfo cardInfo = new CardInfo(1L,
+                user,
+                "1234567812341234",
+                "Zenya",
+                LocalDate.now());
+
+        when(cardInfoRepository.findById(1L)).thenReturn(Optional.of(cardInfo));
+
+        when(cacheManager.getCache("user_cache")).thenReturn(userCache);
+        when(cacheManager.getCache("user_email_cache")).thenReturn(userCache);
+
+        userService.deleteCardInfoFromUserById(1L);
+
+    }
+
+
+
 
 
 
