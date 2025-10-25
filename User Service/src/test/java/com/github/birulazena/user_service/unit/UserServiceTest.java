@@ -15,6 +15,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -45,6 +47,12 @@ public class UserServiceTest {
 
     @Mock
     private CardInfoMapper cardInfoMapper;
+
+    @Mock
+    private CacheManager cacheManager;
+
+    @Mock
+    private Cache userEmailCache;
 
     @InjectMocks
     private UserService userService;
@@ -296,12 +304,17 @@ public class UserServiceTest {
                 "Zenya",
                 "Birulia",
                 LocalDate.now(),
-                "birulya.zhenka@gmail.com",
-                new ArrayList<>());
+                "birulya.zhenka@gmail.com", new ArrayList<>());
 
         when(userRepositoryJpa.findById(1L)).thenReturn(Optional.of(user));
-        userRepositoryJpa.deleteById(1L);
+        when(cacheManager.getCache("user_email_cache")).thenReturn(userEmailCache);
+
+        userService.deleteUserById(1L);
+
     }
+
+    @Test
+    public void addCardInfoToUserException()
 
 
 
