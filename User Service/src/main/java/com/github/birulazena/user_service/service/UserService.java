@@ -87,6 +87,7 @@ public class UserService {
 
 
     @CacheEvict(value = "user_cache", key = "#id")
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void deleteUserById(Long id) {
         User user = userRepositoryJpa.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not fount ID: " + id));
