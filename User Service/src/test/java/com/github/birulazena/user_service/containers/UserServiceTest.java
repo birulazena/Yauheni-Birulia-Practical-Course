@@ -1,16 +1,24 @@
 package com.github.birulazena.user_service.containers;
 
+import com.github.birulazena.user_service.dto.CardInfoRequestDto;
+import com.github.birulazena.user_service.dto.CardInfoResponseDto;
 import com.github.birulazena.user_service.dto.UserRequestDto;
 import com.github.birulazena.user_service.dto.UserResponseDto;
+import com.github.birulazena.user_service.entities.CardInfo;
 import com.github.birulazena.user_service.entities.User;
+import com.github.birulazena.user_service.repository.CardInfoRepository;
 import com.github.birulazena.user_service.repository.UserRepositoryJpa;
 import com.github.birulazena.user_service.service.UserService;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -49,9 +57,13 @@ public class UserServiceTest {
     private UserRepositoryJpa userRepositoryJpa;
 
     @Autowired
+    private CardInfoRepository cardInfoRepository;
+
+    @Autowired
     private CacheManager cacheManager;
 
     @Test
+    @Transactional
     public void createUserTest() {
         UserRequestDto userRequestDto = new UserRequestDto(
                 "Zenya",
@@ -78,6 +90,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @Transactional
     public void getUserByIdTest() {
         User user = new User(null,
                 "Zenya",
@@ -95,7 +108,215 @@ public class UserServiceTest {
         assertEquals(userResponseDto1, userCache.get(user.getId(), UserResponseDto.class));
 
         UserResponseDto userResponseDto2 = userService.getUserById(user.getId());
-//        assertEquals(userResponseDto1, userResponseDto2);
+        assertEquals(userResponseDto1, userResponseDto2);
+
+    }
+
+    @Test
+    @Transactional
+    public void findAllUsersTest() {
+        User user1 = new User(null,
+                "Zenya",
+                "Birulia",
+                LocalDate.now(),
+                "birulya.zhenka@gmail.com",
+                new ArrayList<>()
+        );
+        User user2 = new User(null,
+                "Maksim",
+                "Birulia",
+                LocalDate.now(),
+                "birulya.makim@gmail.com",
+                new ArrayList<>()
+        );
+
+        userRepositoryJpa.save(user1);
+        userRepositoryJpa.save(user2);
+
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<UserResponseDto> page = userService.findAllUsers(pageable);
+
+        assertTrue(page.getContent().stream().anyMatch(u -> u.email().equals("birulya.zhenka@gmail.com")));
+        assertTrue(page.getContent().stream().anyMatch(u -> u.email().equals("birulya.makim@gmail.com")));
+    }
+
+    @Test
+    @Transactional
+    public void getUserByEmailTest() {
+        User user = new User(null,
+                "Zenya",
+                "Birulia",
+                LocalDate.now(),
+                "birulya.zhenka@gmail.com",
+                new ArrayList<>()
+        );
+
+        user = userRepositoryJpa.save(user);
+
+        UserResponseDto userResponseDto1 = userService.getUserByEmail(user.getEmail());
+
+        Cache userCache = cacheManager.getCache("user_email_cache");
+        assertEquals(userResponseDto1, userCache.get(user.getEmail(), UserResponseDto.class));
+
+        UserResponseDto userResponseDto2 = userService.getUserByEmail(user.getEmail());
+        assertEquals(userResponseDto1, userResponseDto2);
+    }
+
+    @Test
+    @Transactional
+    public void updateUserTest() {
+        User user = new User(null,
+                "Zenya",
+                "Birulia",
+                LocalDate.now(),
+                "birulya.zhenka@gmail.com",
+                new ArrayList<>()
+        );
+
+        UserRequestDto userRequestDto = new UserRequestDto("Zenya",
+                "birulia",
+                LocalDate.now(),
+                "birulya.zhenka@gmail.com",
+                new ArrayList<>());
+
+        user = userRepositoryJpa.save(user);
+        UserResponseDto updateUser = userService.updateUser(user.getId(), userRequestDto);
+
+        User dbUser = userRepositoryJpa.findById(user.getId()).orElseThrow();
+        assertEquals("birulia", dbUser.getSurname());
+
+        Cache userCache = cacheManager.getCache("user_cache");
+        Cache emailCache = cacheManager.getCache("user_email_cache");
+
+        assertNotNull(userCache.get(user.getId(), UserResponseDto.class));
+        assertNotNull(emailCache.get("birulya.zhenka@gmail.com", UserResponseDto.class));
+
+        assertEquals(updateUser, userCache.get(user.getId(), UserResponseDto.class));
+        assertEquals(updateUser, emailCache.get("birulya.zhenka@gmail.com", UserResponseDto.class));
+    }
+
+    @Test
+    @Transactional
+    public void deleteUserByIdTest() {
+        User user = new User(null,
+                "Zenya",
+                "Birulia",
+                LocalDate.now(),
+                "birulya.zhenka@gmail.com",
+                new ArrayList<>()
+        );
+
+        user = userRepositoryJpa.save(user);
+
+        cacheManager.getCache("user_cache").put(user.getId(), user);
+        cacheManager.getCache("user_email_cache").put(user.getEmail(), user);
+
+        userService.deleteUserById(user.getId());
+
+        assertNull(cacheManager.getCache("user_cache").get(user.getId()));
+        assertNull(cacheManager.getCache("user_email_cache").get(user.getEmail()));
+
+        assertFalse(userRepositoryJpa.findById(user.getId()).isPresent());
+    }
+
+    @Test
+    @Transactional
+    public void addCardInfoToUserTest() {
+        User user = new User(null,
+                "Zenya",
+                "Birulia",
+                LocalDate.now(),
+                "birulya.zhenka@gmail.com",
+                new ArrayList<>()
+        );
+
+        user = userRepositoryJpa.save(user);
+
+        cacheManager.getCache("user_cache").put(user.getId(), user);
+        cacheManager.getCache("user_email_cache").put(user.getEmail(), user);
+
+        CardInfoRequestDto cardInfoRequestDto = new CardInfoRequestDto(user.getId(),
+                "1234123412341234",
+                "Zenya",
+                LocalDate.now());
+
+        CardInfoResponseDto cardInfoResponseDto = userService.addCardInfoToUser(cardInfoRequestDto);
+
+        Optional<CardInfo> dbCardInfo = cardInfoRepository.findById(cardInfoResponseDto.id());
+        assertEquals("1234123412341234", dbCardInfo.get().getNumber());
+
+        assertNull(cacheManager.getCache("user_cache").get(user.getId()));
+        assertNull(cacheManager.getCache("user_email_cache").get(user.getEmail()));
+    }
+
+    @Test
+    @Transactional
+    public void updateCardInfoToUserTest() {
+        User user = new User(null,
+                "Zenya",
+                "Birulia",
+                LocalDate.now(),
+                "birulya.zhenka@gmail.com",
+                new ArrayList<>()
+        );
+
+        user = userRepositoryJpa.save(user);
+
+        CardInfo cardInfo = new CardInfo(null,
+                user,
+                "1234123412341234",
+                "Zenya",
+                LocalDate.now());
+
+        cardInfo = cardInfoRepository.save(cardInfo);
+
+        cacheManager.getCache("user_cache").put(user.getId(), user);
+        cacheManager.getCache("user_email_cache").put(user.getEmail(), user);
+
+        CardInfoRequestDto cardInfoRequestDto = new CardInfoRequestDto(user.getId(),
+                "1122112211221122",
+                "Zenya",
+                LocalDate.now());
+
+        CardInfoResponseDto cardInfoResponseDto = userService.updateCardInfoToUser(cardInfo.getId(), cardInfoRequestDto);
+
+        CardInfo dbCardInfo = cardInfoRepository.findById(cardInfo.getId()).orElseThrow();
+        assertEquals("1122112211221122", dbCardInfo.getNumber());
+
+        assertNull(cacheManager.getCache("user_cache").get(user.getId()));
+        assertNull(cacheManager.getCache("user_email_cache").get(user.getEmail()));
+    }
+
+    @Test
+    @Transactional
+    public void deleteCardInfoToUserByIdTest() {
+        User user = new User(null,
+                "Zenya",
+                "Birulia",
+                LocalDate.now(),
+                "birulya.zhenka@gmail.com",
+                new ArrayList<>()
+        );
+
+        user = userRepositoryJpa.save(user);
+
+        CardInfo cardInfo = new CardInfo(null,
+                user,
+                "1234123412341234",
+                "Zenya",
+                LocalDate.now());
+
+        cardInfo = cardInfoRepository.save(cardInfo);
+
+        cacheManager.getCache("user_cache").put(user.getId(), user);
+        cacheManager.getCache("user_email_cache").put(user.getEmail(), user);
+
+        userService.deleteCardInfoFromUserById(cardInfo.getId());
+
+        assertFalse(cardInfoRepository.findById(cardInfo.getId()).isPresent());
+
+        assertNull(cacheManager.getCache("user_cache").get(user.getId()));
+        assertNull(cacheManager.getCache("user_email_cache").get(user.getEmail()));
 
     }
 

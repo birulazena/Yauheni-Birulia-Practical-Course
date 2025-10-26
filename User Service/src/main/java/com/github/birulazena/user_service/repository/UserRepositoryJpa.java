@@ -14,6 +14,7 @@ public interface UserRepositoryJpa extends JpaRepository<User, Long> {
 
     User save(User user);
 
+    @EntityGraph(attributePaths = "cards")
     Optional<User> findById(Long id);
 
     @Query("SELECT u FROM User u")
