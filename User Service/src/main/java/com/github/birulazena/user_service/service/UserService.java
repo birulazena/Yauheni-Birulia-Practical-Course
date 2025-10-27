@@ -31,6 +31,7 @@ public class UserService {
     public UserResponseDto createUser(UserRequestDto userDto) {
 
         User user = userMapper.toEntity(userDto);
+        user.getCards().forEach(c -> c.setUser(user));
         User saveUser = userRepositoryJpa.save(user);
         return userMapper.toDto(saveUser);
     }
@@ -55,6 +56,7 @@ public class UserService {
 
         User user = userMapper.toEntity(userDto);
         user.setId(id);
+        user.getCards().forEach(c -> c.setUser(user));
         User saveUser = userRepositoryJpa.save(user);
         return userMapper.toDto(saveUser);
     }
