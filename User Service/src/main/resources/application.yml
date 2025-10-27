@@ -1,18 +1,10 @@
 spring:
   profiles:
-    active: local
+    active: docker
   liquibase:
     change-log: classpath:db/master.xml
-  datasource:
-    url: jdbc:postgresql://localhost:5432/user_service_db_local
-    username: my_name_local
-    password: my_password_local
   jpa:
     generate-ddl: false
     show-sql: true
-  data:
-    redis:
-      host: localhost
-      port: 6379
   cache:
     type: redis

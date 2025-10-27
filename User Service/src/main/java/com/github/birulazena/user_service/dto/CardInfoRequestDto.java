@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
-public record CardInfoRequestDto(@NotNull Long userId,
+public record CardInfoRequestDto(Long userId,
                                  @NotBlank String number,
                                  @NotBlank String holder,
                                  LocalDate expirationDate) {

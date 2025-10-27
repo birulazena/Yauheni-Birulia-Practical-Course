@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -51,6 +52,7 @@ public class UserService {
         }
 
         User user = userMapper.toEntity(userDto);
+        user.getCards().forEach(c -> c.setUser(user));
         User saveUser = userRepositoryJpa.save(user);
         return userMapper.toDto(saveUser);
     }
@@ -83,6 +85,7 @@ public class UserService {
         userRepositoryJpa.findById(id).orElseThrow(() -> new UserNotFoundException("User not found ID: " + id));
         User user = userMapper.toEntity(userDto);
         user.setId(id);
+        user.getCards().forEach(c -> c.setUser(user));
         User saveUser = userRepositoryJpa.save(user);
         return userMapper.toDto(saveUser);
     }
