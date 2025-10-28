@@ -1,0 +1,26 @@
+stages:
+  - build
+  - test
+#  - analyze
+#  - docker
+
+build:
+  stage: build
+  image: eclipse-temurin:24
+  script:
+    - ./gradlew build -x test
+
+test:
+  stage: test
+  image: eclipse-temurin:24
+  script:
+    - ./gradlew test
+
+#sonarqube:
+#  stage: test
+#  image: eclipse-temurin:24
+#  script:
+#    - ./gradlew sonarqube -Dsonar.projectKey=my-project \
+#      -Dsonar.host.url=http://sonarqube:9000 \
+#      -Dsonar.login=$SONAR_TOKEN
+
