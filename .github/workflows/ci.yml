@@ -25,4 +25,4 @@ jobs:
         run: chmod +x "User Service/gradlew"
 
       - name: Build
-        run: ./User\ Service/gradlew build --no-daemon
+        run: ./gradlew build --no-daemon
