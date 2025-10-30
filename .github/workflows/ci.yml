@@ -39,7 +39,7 @@ jobs:
       - name: Code Analysis
         uses: SonarSource/sonarcloud-github-action@v2  
         with:
-          projectBaseDir: ./User Service
+          projectBaseDir: "./User Service"
         env:
           SONAR_TOKEN: ${{ secrets.MySonarToken }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
