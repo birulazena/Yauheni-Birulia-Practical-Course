@@ -32,3 +32,6 @@ jobs:
 
       - name: Build
         run: ./gradlew build --no-daemon
+
+      - name: Testing
+        run: ./gradlew test --no-daemon
