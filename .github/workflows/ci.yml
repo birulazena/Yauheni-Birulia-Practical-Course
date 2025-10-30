@@ -43,7 +43,7 @@ jobs:
             -Dsonar.projectKey=birulazena_Yauheni-Birulia-Practical-Course
             -Dsonar.organization=777huvak
             -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.java.binaries=build/classes
+            -Dsonar.java.binaries=build/classes/java/main
         env:
           SONAR_TOKEN: ${{ secrets.MySonarToken }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
