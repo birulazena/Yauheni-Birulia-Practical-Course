@@ -35,3 +35,9 @@ jobs:
 
       - name: Testing
         run: ./gradlew test --no-daemon
+
+      - name: Code Analysis
+        uses: SonarSource/sonarcloud-github-action@v2  
+        env:
+          SONAR_TOKEN: ${{ secrets.MySonarToken }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
