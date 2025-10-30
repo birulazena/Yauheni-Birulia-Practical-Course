@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/user_service_db_docker
+      SPRING_DATASOURCE_USERNAME: my_name_docker
+      SPRING_DATASOURCE_PASSWORD: my_password_docker
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:16.1
+    environment:
+      - POSTGRES_DB=user_service_db_docker
+      - POSTGRES_USER=my_name_docker
+      - POSTGRES_PASSWORD=my_password_docker
+    ports:
+      - "5432:5432"
+  redis:
+    image: redis:8.2
+    ports:
+      - "6379:6379"

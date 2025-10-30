@@ -1,0 +1,10 @@
+spring:
+  profiles:
+    active: docker
+  liquibase:
+    change-log: classpath:db/master.xml
+  jpa:
+    generate-ddl: false
+    show-sql: true
+  cache:
+    type: redis
