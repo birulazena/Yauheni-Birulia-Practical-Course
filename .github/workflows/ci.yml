@@ -2,6 +2,8 @@ name: CI pipeline
 
 on:
   push:
+    paths:
+      - 'User Service/**'
     branches: ["CIPipeline"]
 
 jobs:
@@ -19,7 +21,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Permission to execute gradlew
-        run: chmod +x ./gradlew
+        run: chmod +x "User Service/gradlew"
 
       - name: Build
-        run: ./gradlew build --no-daemon
+        run: "User Service/gradlew build --no-daemon"
