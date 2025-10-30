@@ -2,8 +2,6 @@ name: CI pipeline
 
 on:
   push:
-    paths:
-      - 'User Service/**'
     branches: ["CIPipeline"]
 
 jobs:
