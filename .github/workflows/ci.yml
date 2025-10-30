@@ -22,7 +22,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Permission to execute gradlew
-        run: chmod +x "User Service/gradlew"
+        run: chmod +x ./gradlew
 
       - name: Build
         run: ./gradlew build --no-daemon
