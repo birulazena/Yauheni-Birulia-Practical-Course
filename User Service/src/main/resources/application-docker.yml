@@ -5,5 +5,5 @@ spring:
     password: my_password_docker
   data:
     redis:
-      host: localhost
+      host: redis
       port: 6379
