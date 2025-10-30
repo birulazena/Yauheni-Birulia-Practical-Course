@@ -15,10 +15,10 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '24'
+          java-version: '21'
           distribution: 'temurin'
 
-      - name: Permission to execute grablew
+      - name: Permission to execute gradlew
         run: chmod +x ./gradlew
 
       - name: Build
