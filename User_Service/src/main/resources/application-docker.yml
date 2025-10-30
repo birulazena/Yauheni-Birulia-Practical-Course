@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/user_service_db_docker
+    username: my_name_docker
+    password: my_password_docker
+  data:
+    redis:
+      host: redis
+      port: 6379
