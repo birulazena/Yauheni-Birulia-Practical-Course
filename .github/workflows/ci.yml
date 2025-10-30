@@ -1,0 +1,49 @@
+name: CI pipeline
+
+on:
+  push:
+    branches: ["CIPipeline"]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: User_Service
+
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '24'
+          distribution: 'temurin'
+
+      - name: Permission to execute gradlew
+        run: chmod +x ./gradlew
+
+      - name: Build
+        run: ./gradlew build --no-daemon
+
+      - name: Testing
+        run: ./gradlew test --no-daemon
+
+      - name: Code Analysis
+        uses: SonarSource/sonarcloud-github-action@v2  
+        with:
+          args: >
+            -Dsonar.projectKey=birulazena_Yauheni-Birulia-Practical-Course
+            -Dsonar.organization=777huvak
+            -Dsonar.host.url=https://sonarcloud.io
+            -Dsonar.java.binaries=User_Service/build/classes/java/main
+        env:
+          SONAR_TOKEN: ${{ secrets.MySonarToken }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
